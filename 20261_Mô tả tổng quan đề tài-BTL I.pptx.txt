@@ -1,0 +1,381 @@
+MÔ TẢ TỔNG QUAN ĐỀ TÀI
+1
+https://docs.google.com/document/d/1m9rYl75TZToIJ_xCIdjF0FqqEhJd2Ctn_lMsAXOZcOk/edit?usp=sharing
+
+Mục lục
+Yêu cầu tổng quan của đề tài
+Quy trình bảo vệ
+Yêu cầu chức năng và phi chức năng
+Cơ sở dữ liệu
+Danh sách API
+Đăng ký đăng nhập
+2
+
+Mục lục
+Yêu cầu tổng quan của đề tài
+Quy trình bảo vệ
+Yêu cầu chức năng và phi chức năng
+Cơ sở dữ liệu
+Danh sách API
+Đăng ký đăng nhập
+3
+
+Yêu cầu tổng quan của đề tài
+Phát triển một hệ thống có client (ứng dụng di động), hệ thống database server, và service server (tùy chọn công nghệ) để xây dựng một hệ thống học trực tuyến “Tập động tác kĩ năng” cho người dùng Việt Nam.
+Với IT4788: làm một Ứng dụng đa nền tảng vốn cho người dùng đăng video, chỉnh sửa bài đăng, like/comment. Ứng dụng được (các) server hỗ trợ
+Database lưu trữ các bài viết, video, thông tin của người dùng
+AI server phục vụ chức năng lấy điểm poses theo thời gian và đối sánh động tác cơ thể
+Service server cung cấp các api để ứng dụng di động truy cập
+Các push notification được thực hiện bằng Firebase 
+Các chức năng tô đỏ là nhóm chức năng đã được hoàn thành (hoặc gần hoàn thành) ở kỳ trước
+4
+nếu người dùng trả phí: rokoko
+miễn phí: easymocap
+
+Yêu cầu tổng quan của đề tài
+User story (1):
+Người dùng Giáo Viên sẽ vừa tập động tác vừa sử dụng điện thoại để quay 01 video hoặc quay đồng thời 2 video. 
+Còn phía server, sau khi nhận được dữ liệu của điện thoại thì nó cần phải lưu trữ vào một mạng xã hội của nó. MXH này có cho phép đăng video, sửa bài, chấm bài, like, comment và chặn giữa các tài khoản. Trong số các tài khoản, có tài khoản là học viên, có tài khoản là giáo viên. Ở đây ta giả sử giáo viên khi đăng bài lên thì luôn là đăng video chuẩn và video chuẩn đó được sử dụng làm đáp án chấm điểm của học viên
+5
+5
+
+Yêu cầu tổng quan của đề tài
+User story (2):
+Mỗi học viên (HV) khi đăng ký trên hệ thống sẽ được tùy chọn tham gia một lớp học trực tuyến (mỗi lớp do một giáo viên - GV - quản lý). Các GV khác nhau sẽ đăng video giống nhau về động tác nhưng có thể khác nhau về lời hướng dẫn bên trong. GV càng hướng dẫn chi tiết thì HV càng dễ làm đúng.
+Khi HV tham gia vào một khóa học, sẽ thấy có các video bài mẫu của GV (tự đăng). HV nhấn nút nộp bài (vị trí giống nút chia sẻ trên Facebook) và HV sẽ tự quay tối đa 02 video (ở hai góc nhìn khác nhau) rồi upload lên trang của mình, hệ thống tự động điền hashtag của khóa học và của bài tập.
+Như vậy cần nâng cấp chút ở API add_post (tại đây):
+Cho phép người dùng chỉ add một video duy nhất thay vì phải add cả 2 video. Tất nhiên nếu muốn họ vẫn add 2 video được
+6
+6
+
+Yêu cầu tổng quan của đề tài
+User story (3):
+Để quay hai video một lúc thì cũng cần nâng cấp code của API sau:
+		API edit_post với mô tả tại đây
+Cho phép API edit_post bổ sung thêm video vào video ban đầu (thiết lập sẵn là bên trái phải)
+Nếu một bài viết mới có video trái (hoặc phải) thì API này cho phép bổ sung thêm video mới ở bên còn lại
+Nhưng phiên bản mới của API cũng phải cho phép sửa video cũ mà không thêm video mới
+API (bản mới) cũng cho phép cả sửa video cũ và thêm video mới
+7
+7
+
+Yêu cầu tổng quan của đề tài
+User story (4):
+Hệ thống sẽ cho phép app điện thoại và software/web local trên PC (nhóm BTL tự phát triển) thông báo cho nhau khi app đăng bài (video cần chấm) thành công.
+Bằng cách sử dụng Firebase Realtime Database (tuỳ)
+Software/web local trên PC sẽ tải các frame của video về, sử dụng YoLo26x (hoặc ViTPose) để tạo pose2D
+Một monocular (chẳng hạn WHAM hoặc GVHMR) trong sofware sẽ phát hiện pose3D
+Software/web local trên PC cũng sẽ tải pose3D của video thầy (server lưu) về và đối sánh động tác bằng DTW, lưu lại dạng HTML
+Software/web local hiển thị HTML trên PC cũng như gọi API gửi file zip
+8
+8
+
+Yêu cầu tổng quan của đề tài
+Danh sách các source code của monocular AI có thể nhận diện Pose3D từ một video:
+	- TCPFormer (SOTA của 2025) tại đây
+- WHAM (SOTA trong nhánh không cần biết thông tin của camera, camera di chuyển được) tại đây
+- GVHMR (nâng cấp của WHAM trong đó có tính đến gia tốc trọng trường) tại đây
+SV có thể tích hợp (các) source code này như một pipeline trên software/web local PC của mình.
+9
+9
+
+Yêu cầu tổng quan của đề tài
+Nếu người dùng upload 02 video (giả sử video đã được quay với tuỳ chọn đồng bộ bằng phần mềm) thì software của PC có thể sử dụng code sau:
+Code giải bài toán tối ưu phi lồi để fusion 2 bộ pose2D (vốn được sinh ra từ Yolo26x), kết hợp với ràng buộc chiều dài xương để ra toạ độ 3D của pose
+Khi cài đặt thành pipeline của software/web local thì nhóm có thể dùng Yolo26x hoặc ViTPose tại PC để tạo pose2D được
+SV được toàn quyền nâng cấp code kia để có phiên bản hoàn hảo hơn
+10
+10
+
+Mục lục
+Yêu cầu tổng quan của đề tài
+Quy trình bảo vệ
+Yêu cầu chức năng và phi chức năng
+Cơ sở dữ liệu
+Danh sách API
+Đăng ký đăng nhập
+11
+
+2. Quy trình bảo vệ
+2.1. Thành viên
+2.2. Thời gian bảo vệ
+2.3. Hình thức bảo vệ
+12
+
+2. Quy trình bảo vệ
+2.1. Thành viên
+2.2. Thời gian bảo vệ
+2.3. Hình thức bảo vệ
+13
+
+2.1. Thành viên
+Mỗi nhóm cần tối đa năm sinh viên để thực hiện các công việc sau (không bắt buộc):
+Một bạn gọi các API của Database server, AI server, service server để có các dữ liệu bài viết, thông tin cá nhân, điểm số (nếu là HV) của người dùng
+Một bạn phát triển thư viện xử lý JSON trả về từ server
+Một bạn phát triển giao diện và xử lý sự kiện cho ứng dụng di động
+Một bạn xử lý chat và push notification phía clients
+Một bạn đảm nhiệm kiểm thử. Các thành viên có thể thực hiện kiểm thử chéo.
+14
+
+2. Quy trình bảo vệ
+2.1. Thành viên
+2.2. Thời gian bảo vệ
+2.3. Hình thức bảo vệ
+15
+
+2.2. Thời gian bảo vệ
+Chậm nhất là trước khi vào học ngày thứ 4, các sinh viên gửi thông tin về nhóm của mình cùng thông tin liên lạc của nhóm trưởng
+Các danh sách bảo vệ sẽ được gửi cho lớp trước khi bảo vệ
+Các nhóm đến bảo vệ theo đúng lịch của mình, với đầy đủ các thành viên.
+Bảo vệ vào các buổi học thứ 14, 15, 16 của môn học
+Điểm bài tập lớn sẽ được tính vào điểm quá trình của môn học
+16
+
+2.2. Thời gian bảo vệ (2)
+Các nhóm sẽ được bảo vệ thử vào buổi học thứ 13
+Một số nhóm sẽ được chọn lựa để đi bảo vệ thử vào buổi thứ 13.
+Các nhóm chỉ lên trình bày công việc mình làm được, nếu chưa làm được gì hoặc chưa hoàn thành xong hết hoặc không đến thì vẫn được chấp nhận.
+Các nhóm trưởng khác nên có mặt để tham khảo
+Các nhóm nên chuẩn bị như thể đây là một buổi bảo vệ chính thức, để có thể có kết quả tốt trong buổi tiếp theo
+17
+
+2. Quy trình bảo vệ
+2.1. Thành viên
+2.2. Thời gian bảo vệ
+2.3. Hình thức bảo vệ
+18
+
+2.3. Hình thức bảo vệ
+Sinh viên nộp báo cáo bản cứng vào hôm bảo vệ và bản mềm ba ngày trước khi nhóm bảo vệ. Trong báo cáo ghi rõ phân công công việc, link github của mã nguồn hai phía.
+Nhóm sinh viên chuẩn bị đầy đủ ít nhất là 2 điện thoại THẬT (kết nối mạng 3G/4G), laptop hoặc PC có GPU để demo. Không chấp nhận chỉ sử dụng bộ giả lập.
+Khi một nhóm bảo vệ (các thành viên ngồi ở hai bàn đầu, dãy giữa), các nhóm khác (cùng bảo vệ trong ngày) ngồi cách xa ít nhất hai bàn
+Bảo vệ xong, nhóm cần ở lại đến phút cuối của buổi học để có thể trả lời các câu hỏi khác (nếu có)
+19
+
+2.3. Hình thức bảo vệ (2)
+Nhóm sinh viên không nhất thiết phải hoàn thành tất cả các chức năng trong danh sách
+Nhóm được cao điểm nhất là nhóm hoàn thành được nhiều chức năng nhất.
+Để được điểm tối đa, nhóm cần phải hoàn thành tối thiểu được chức năng chấm điểm động tác trên client (tức client tự chấm).
+20
+
+Mục lục
+Yêu cầu tổng quan của đề tài
+Quy trình bảo vệ
+Yêu cầu chức năng và phi chức năng
+Cơ sở dữ liệu
+Danh sách API
+Đăng ký đăng nhập
+21
+
+3. Yêu cầu chức năng và phi chức năng
+3.1. Yêu cầu chức năng
+3.2. Yêu cầu phi chức năng
+22
+
+3. Yêu cầu chức năng và phi chức năng
+3.1. Yêu cầu chức năng
+3.2. Yêu cầu phi chức năng
+23
+
+3.1. Yêu cầu chức năng (1)
+Hệ thống cần phát triển có các chức năng sau:
+Cho phép người dùng đăng ký và đăng nhập vào ứng dụng. Tên đăng nhập là số điện thoại, mật khẩu không phải là số điện thoại, không chứa các ký tự đặc biệt.
+Khi đăng ký thì được phép đăng ký là giáo viên hay học viên
+Cho phép người dùng đăng bài mới với một chế độ duy nhất là public, số lượng từ giới hạn là 500 từ.
+Hệ thống tự động chèn vào phần đầu bài viết của giáo viên hashtag của khóa học và bài tập.
+24
+
+3.1. Yêu cầu chức năng (2)
+Người dùng phải đăng bài viết với tối đa 02 video, có thời lượng tối thiểu 10s. Hai video đó giả sử có thời lượng tương tự nhau.
+Hai video trong bài viết của người dùng sẽ được ghép lại làm một video. Khi đăng bài, người dùng được phép tùy chọn đâu là video bên trái và đâu là video bên phải.
+Khi bài được đăng, bất kỳ ai (trừ khi bị chặn) cũng có thể xem, like, comment được. Số lượng từ trong một comment không vượt quá 500 từ.
+Một khóa học có thể chứa được với tối đa 500 HV.
+25
+
+Một bài viết bất kỳ đều có chức năng cho phép người khác báo cáo
+Một người có thể chặn (block) và bỏ chặn (unblock) bất kỳ ai. Việc chặn sau khi bỏ chặn không bị giới hạn thời gian như trên facebook.
+Việc chặn giữa một HV và GV sẽ khiến HV đó không còn là người học của khóa đó.
+Việc người A chặn một người không khiến bình luận, like của người đó bị xóa khỏi trang cá nhân (nhưng A sẽ không thấy các bình luận này).
+Việc chặn một người sẽ khiến hai người không thể trao đổi tin nhắn với nhau được nữa.
+Việc chặn một người sẽ khiến hai người không xem được trang của nhau.
+26
+3.1. Yêu cầu chức năng (3)
+
+Một GV chỉ lập ra một khóa học duy nhất.
+HV có thể đăng ký nhiều khóa học.
+Chỉ có một cảm xúc like duy nhất, không có nhiều cảm xúc như phiên bản Facebook hiện nay.
+Hiện tại chưa cho phép tiến hành lập nhóm nhiều người cùng chat.
+Khi một HV đăng nhập thành công vào ứng dụng hệ thống sẽ hiển thị ưu tiên các bài viết của khóa học đã đăng ký. Nếu đã hiển thị xong các bài viết của HV thì sẽ hiển thị ngẫu nhiên các bài của những người dùng khác. Ưu tiên sắp xếp theo thời gian. Không hiển thị bài của những người bị chặn.
+Chủ bài viết không xóa bình luận được. Chủ bình luận không sửa được bình luận.
+27
+3.1. Yêu cầu chức năng (4)
+
+GV không làm bài tập của GV khác (kể cả đăng video và viết hashtag thì hệ thống cũng không chấm điểm).
+Không xem được danh sách những người thích một bài viết (nhưng biết được số lượng thích của bài viết).
+Không bày tỏ cảm xúc cho bình luận được.
+Bình luận chỉ chứa văn bản, HTTP link và/hoặc emoticon.
+Được phép tùy chọn âm thanh push notification sao cho thể hiện được “trải nghiệm” tốt nhất.
+Các thông tin được push: có người thích bài viết của bạn, có người bình luận bài viết của bạn, HV/GV đăng bài viết mới, có người gửi tin nhắn cho bạn, có người muốn đăng ký khóa học của bạn, tài khoản đăng nhập trên máy khác… (xem chi tiết bài tập tuần 9).
+28
+3.1. Yêu cầu chức năng (5)
+
+Tải tối đa 02 video một bài viết, tối thiểu 10s. Giả sử người dùng luôn upload 02 video của cùng người và cùng động tác.
+HV hoàn toàn có thể sửa, xóa bài viết (GV thì không). 
+Việc xem video đều có trải nghiệm giống như ứng dụng Facebook.
+Ứng dụng có nút đóng để tắt hoàn toàn ứng dụng.
+Một khi bài viết được đăng xong hoặc sửa xong hoặc xóa xong sẽ chuyển về một trang nào đó (theo đúng kịch bản của Facebook).
+Không có việc tham gia và tạo lập nhóm.
+29
+3.1. Yêu cầu chức năng (6)
+
+Không cho phép tag thành viên khác vào bài viết hoặc đoạn chat hoặc bình luận.
+Ứng dụng cho phép việc chọn video có sẵn ở trong máy.
+Ứng dụng cho phép chèn các emoticon trong bài viết hoặc bình luận hoặc tin nhắn chat bằng cách nhập các ký tự đặc biệt.
+Không cho phép màn hình đăng nhập được chứa thêm nhiều tài khoản.
+Bài viết dài sẽ có nút xem thêm để thu gọn lại. Nhấn vào “Xem thêm” sẽ mở rộng nhưng sau đó không thu gọn được.
+30
+3.1. Yêu cầu chức năng (7)
+
+Cho phép thiết lập tắt push gửi về hoặc thiết lập có push gửi về nhưng dùng âm thanh mặc định (âm kêu vang lên) hoặc âm có tiếng nói (yêu cầu SV thu âm giọng nói để làm file phát ra).
+Cho phép tìm kiếm trong màn hình trang chủ của ứng dụng. Chẳng hạn tìm kiếm với từ khóa “Nga thiên hồ múa” thì vẫn ra được các kết quả về các bài viết có chứa các từ khóa “múa Hồ Thiên Nga”.
+KHÔNG cho phép người dùng tự xóa tài khoản của mình.
+Xây dựng trang quản trị để người quản trị có thể dễ dàng thêm/sửa/xóa trực tiếp các dữ liệu cần thiết (về API Web thì các nhóm được quyền share cho nhau).
+31
+3.1. Yêu cầu chức năng (8)
+
+3. Yêu cầu chức năng và phi chức năng
+3.1. Yêu cầu chức năng
+3.2. Yêu cầu phi chức năng
+32
+
+3.2. Yêu cầu phi chức năng (1)
+Tất cả dữ liệu trước khi gửi lên nên được kiểm tra ở phía client trước
+Trừ lần đăng nhập đầu tiên, hệ thống cần có chức năng cache dữ liệu để tạo cảm giác load nội dung cực kỳ mau chóng cho người dùng. Việc cache chỉ áp dụng cho màn trang chủ.
+Các animation cần phải bắt chước theo Facebook
+Tính năng pull down to refresh và pull up to load more cần được cài đặt
+Ứng dụng cần hoạt động thật trơn tru, tránh việc bị crash đột ngột
+Một khi ứng dụng gửi yêu cầu lên server, cần có màn hình loading, sau đó một khi không có dữ liệu trả về hoặc dữ liệu trả về không đúng định dạng thì hiện thông báo về lỗi kết nối.
+Các dữ liệu liên quan đến privacy của người dùng cần được mã hóa
+33
+
+3.2. Yêu cầu phi chức năng (2)
+Khi tắt mạng của điện thoại, nhập dữ liệu và gửi yêu cầu thì ứng dụng vẫn tự xác thực input, nếu input đúng đắn mới kiểm tra trạng thái mạng.
+Các thông báo cần có sự thống nhất với nhau, chẳng hạn ở màn hình Login và màn hình Signup, nếu người dùng nhập sai số điện thoại (thừa số hoặc thiếu số) thì đều có chung một thông báo “Số điện thoại không đúng định dạng” 
+Việc mất kết nối Internet phải thông báo càng sớm càng tốt để hệ thống tránh các thao tác làm tốn tài nguyên cũng như mất thời gian của người dùng.
+Các thông báo về việc người khác đã đăng nhập vào tài khoản trên máy khác cần được báo càng sớm càng tốt
+34
+Cần theo category và cần bổ sung thêm Security (a.HungNT)
+
+3.2. Yêu cầu phi chức năng (2)
+Khi tắt mạng của điện thoại, nhập dữ liệu và gửi yêu cầu thì ứng dụng vẫn tự xác thực input, nếu input đúng đắn mới kiểm tra trạng thái mạng.
+Các thông báo cần có sự thống nhất với nhau, chẳng hạn ở màn hình Login và màn hình Signup, nếu người dùng nhập sai số điện thoại (thừa số hoặc thiếu số) thì đều có chung một thông báo “Số điện thoại không đúng định dạng” 
+Việc mất kết nối Internet phải thông báo càng sớm càng tốt để hệ thống tránh các thao tác làm tốn tài nguyên cũng như mất thời gian của người dùng.
+Các thông báo về việc người khác đã đăng nhập vào tài khoản trên máy khác cần được báo càng sớm càng tốt
+35
+CÂU HỎI 1: LÀM THẾ NÀO ĐỂ THỰC HIỆN ĐƯỢC VIỆC CÓ CHUNG MỘT THÔNG BÁO NHƯ VẬY?
+Cần theo category và cần bổ sung thêm Security (a.HungNT)
+
+3.2. Yêu cầu phi chức năng (3)
+Nhóm không gán các màu trong ứng dụng bằng các tên mà bằng các mã màu cụ thể, có lưu trữ danh sách các mã màu vào một file duy nhất để tiện quản lý.
+=> TẠI SAO? 
+=> LÀM THẾ NÀO ĐỂ BIẾT MÃ MÀU CỦA TỪNG MÀU MỘT TRONG ỨNG DỤNG FACEBOOK?
+
+36
+Trả lời 1: mỗi thiết bị đều có một cách hiểu khác nhau về các màu BLACK, RED, PINK, GREEN. Do đó ta không dùng tên màu mà gán sẵn các mã RGB cụ thể, như vậy trên các dòng máy khác nhau sẽ có chung cách hiển thị màu.
+Trả lời 2: Mở ứng dụng Facebook, chụp màn hình, lấy ra các khu vực màu, trên Internet sẽ có các trang web cung cấp mã màu của một vùng ảnh nhất định
+
+3.2. Yêu cầu phi chức năng (4)
+Với IT4788: Nhóm cần làm cho các file cài không quá lớn. 
+=> TẠI SAO
+=> BẰNG CÁCH NÀO?
+37
+Trả lời 1: Vì file cài lớn quá sẽ khiến người dùng ngại tải về
+Trả lời 2: trước khi gom vào Project cần tiến hành giảm dung lượng của file ảnh. Hoặc sinh viên có thể nghĩ đến một giải pháp khác là các bức ảnh nền (cũng như các dữ liệu đa phương tiện khác) chỉ được tải về khi người dùng cài xong ứng dụng. 
+
+Mục lục
+Yêu cầu tổng quan của đề tài
+Quy trình bảo vệ
+Yêu cầu chức năng và phi chức năng
+Cơ sở dữ liệu
+Danh sách API
+Đăng ký đăng nhập
+38
+
+4. Cơ sở dữ liệu
+SV cần thiết kế ra được cơ sở dữ liệu phục vụ các dữ liệu liên quan đến (dự kiến):
+Tài khoản cá nhân: id, tên, mật khẩu, số điện thoại, link avatar, token, danh sách id bị chặn bởi cá nhân, loại user
+Bài viết cá nhân: id, id của chủ bài viết, nội dung bài viết, media, danh sách các id của bình luận, danh sách các id của người thích, thời điểm tạo
+Bình luận: id, id của người viết bình luận, nội dung bình luận, thời điểm tạo
+Đoạn chat: id của người A, id của người B, id của tin chat, nội dung chat, thời điểm tạo
+Một số bảng cơ sở dữ liệu khác (phục vụ cho push)
+Sinh viên được toàn quyền sử dụng loại CSDL nào hoặc tự đề xuất cấu trúc của bảng, ƯU TIÊN CSDL QUAN HỆ
+39
+
+4. Cơ sở dữ liệu
+SV cần thiết kế ra được cơ sở dữ liệu phục vụ các dữ liệu liên quan đến (dự kiến):
+Tài khoản cá nhân: id, tên, mật khẩu, số điện thoại, link avatar, token, danh sách id bị chặn bởi cá nhân, loại user
+Bài viết cá nhân: id, id của chủ bài viết, nội dung bài viết, media, danh sách các id của bình luận, danh sách các id của người thích, thời điểm tạo
+Bình luận: id, id của người viết bình luận, nội dung bình luận, thời điểm tạo
+Đoạn chat: id của người A, id của người B, id của tin chat, nội dung chat, thời điểm tạo
+Một số bảng cơ sở dữ liệu khác (phục vụ cho push)
+Sinh viên được toàn quyền sử dụng loại CSDL nào hoặc tự đề xuất cấu trúc của bảng, ƯU TIÊN CSDL QUAN HỆ
+
+40
+CÂU HỎI 2: SINH VIÊN CÓ ĐỀ XUẤT THIẾT KẾ CƠ SỞ DỮ LIỆU NÀO KHÁC KHÔNG?
+
+Mục lục
+Yêu cầu tổng quan của đề tài
+Quy trình bảo vệ
+Yêu cầu chức năng và phi chức năng
+Cơ sở dữ liệu
+Danh sách API
+Đăng ký đăng nhập
+41
+
+5. Danh sách API
+Với IT4409:
+Kỳ 20261, các SV không cần phát triển lại toàn bộ API đã có, mà việc phát triển thêm API (đã có) được trở thành BT Thêm.
+	Các nhóm cần làm front-end đẹp: giống Facebook cũng được
+Các nhóm tập trung làm một server local host, người dùng sẽ không dùng phần mềm mà bật web browser để thao tác
+Người dùng sẽ tự quay video (tối đa 2) giả sử quay cùng lúc
+	Người dùng nạp video vào PC (hoặc truyền trong LAN)
+	Web browser giúp đăng video (tức post bài)
+Local host giúp xác định pose3D (Cả GV và HV), chấm điểm (ở HV) và comment điểm (tự động - ở HV) và hiển thị điểm
+Với IT4788:
+	Kỳ 20261, server đã có và đi vào hoạt động
+Các nhóm tập trung làm app di động và software PC. Các công nghệ như Flutter và React Native đủ sức cung cấp sản phẩm app và software
+42
+
+Danh sách các API của phiên bản 20252
+Mô tả đề tài của 20252:
+https://drive.google.com/drive/folders/1cNaLncB5Gc65j7qxJOLU8DJaNtl3Bw72?usp=sharing
+
+Github của nhóm cũ (backend):
+https://github.com/ngocbityta/Mercari-server
+
+Github của nhóm làm tốt nhất phía mobile:
+https://github.com/bonxom/Pose_Tracking
+43
+43
+
+DANH SÁCH MÃ RESPONSE
+44
+
+DANH SÁCH MÃ RESPONSE (2)
+1011 | Could not publish this post (Bài đăng vi phạm tiêu chuẩn cộng đồng)
+1012 | Limited access (Bài đăng bị giới hạn ở một số quốc gia)
+
+45
+
+Các câu hỏi thường gặp
+Danh sách các câu hỏi thường gặp của IT4409 tại đây.
+https://docs.google.com/document/d/1x8-8I7S1BifOAfWhv_KeBHer8jZgHAyDbrHn-47-CAk/edit?usp=sharing 
+
+
+
+Danh sách các câu hỏi thường gặp của IT4788 tại đây.
+https://docs.google.com/document/d/1UpNvVLpxT_kNcAr8DJyr1wjj7aJmREKBhzR254-sLxM/edit?usp=sharing 
+46
+46
+
+47
